@@ -15,7 +15,7 @@ NA=2; % length(temperature_celsius);
 x=zeros(NA,1);
 
 for i=1:3
-    P=(100^i)*eye(NA,NA);
+    P=(10^i)*eye(NA,NA);
 
     fprintf('\n\n\NA = %f\n\t\t\t %f\n', length(NA));
 
@@ -34,12 +34,29 @@ for i=1:3
     x1=pinv(A)*b; %x1=A\b;
     fprintf('Palyginimui pinv(A)*b = %f\n\t\t  %f\n',x1);
 
-    plot(xx'); grid;
+	% jeigu norime atvaizduoti viename grafike ->
+%     plot(xx');
+%     grid;
+%     hold on;
+
+    % atvaizduojame parametru iverciu priklausomybe i grafika pagal
+    % stiprinima
+    subplot(2,1,1);
+    plot(xx(1,:));
+    title('Koeficientas k1');
+    legend('stiprinimas = 10', 'stiprinimas = 100', 'stiprinimas = 1000');
+    grid;
     hold on;
+    subplot(2,1,2);
+    plot(xx(2,:));
+    title('Koeficientas k2');
+    legend('stiprinimas = 10', 'stiprinimas = 100', 'stiprinimas = 1000');
+    grid;
+    hold on;
+
 end
 
 hold off;
-legend('100^1 x1', '100^1 x2', '100^2 x1', '100^2 x2', '100^3 x1', '100^3 x2'); 
 
 
 function[x,K,P]=rlse_online(aT_k1,b_k1,x,P)

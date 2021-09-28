@@ -13,36 +13,53 @@ fprintf('\n\n\temperature_farenheit = %f\n\t\t\t %f\n', length(temperature_faren
 
 NA=2; % length(temperature_celsius);
 x=zeros(NA,1);
-% TODO: cia rasyk for is daugink is 10, 100, 100(kaip dabar)
-% for i=1:3
-%   PRT=(10^i)*eye(NA,NA);
-% end
 
-P=1000*eye(NA,NA);
+for i=1:3
+    P=(10^i)*eye(NA,NA);
 
-fprintf('\n\n\NA = %f\n\t\t\t %f\n', length(NA));
+    fprintf('\n\n\NA = %f\n\t\t\t %f\n', length(NA));
 
-%Jei k iki 10, o P=1*..., tai gaunasi blogas tikslumas, jei P=10000*...
-%tikslumas gereja...
-xx=[]
-for k=1:length(temperature_celsius), %padidinus iteraciju skaiciu, pvz. iki 1000 sprendinys arteja prie xo=[2 1]
-    A(k,:)=[temperature_farenheit(k) 1];
-    b(k,:)=temperature_celsius(k); %A(k,:)*xo+0.2*randn;
-    [x,K,P]=rlse_online(A(k,:),b(k,:),x,P);
-    xx=[xx x];
+    %Jei k iki 10, o P=1*..., tai gaunasi blogas tikslumas, jei P=10000*...
+    %tikslumas gereja...
+    xx=[]
+    for k=1:length(temperature_celsius), %padidinus iteraciju skaiciu, pvz. iki 1000 sprendinys arteja prie xo=[2 1]
+        A(k,:)=[temperature_farenheit(k) 1];
+        b(k,:)=temperature_celsius(k); %A(k,:)*xo+0.2*randn;
+        [x,K,P]=rlse_online(A(k,:),b(k,:),x,P);
+        xx=[xx x];
+    end
+
+    fprintf('\n\n\nx ivertis taikant RLSE = %f\n\t\t\t %f\n',x(1),x(2));
+
+    x1=pinv(A)*b; %x1=A\b;
+    fprintf('Palyginimui pinv(A)*b = %f\n\t\t  %f\n',x1);
+
+% uncomment if you want to plot in one graph
+%     plot(xx');
+%     grid;
+%     hold on;
+
+    % atvaizduojame parametru iverciu priklausomybe i grafika pagal
+    % stiprinima
+    subplot(2,1,1);
+    plot(xx(1,:));
+    title('Koeficientas k1');
+    legend('stiprinimas = 10', 'stiprinimas = 100', 'stiprinimas = 1000');
+    grid;
+    hold on;
+    subplot(2,1,2);
+    plot(xx(2,:));
+    title('Koeficientas k2');
+    legend('stiprinimas = 10', 'stiprinimas = 100', 'stiprinimas = 1000');
+    grid;
+    hold on;
+
 end
 
-fprintf('\n\n\nx ivertis taikant RLSE = %f\n\t\t\t %f\n',x(1),x(2));
-x1=pinv(A)*b; % su pinv
-fprintf('Palyginimui pinv(A)*b = %f\n\t\t  %f\n',x1);
+hold off;
 
-
-plot(xx'); grid
 
 function[x,K,P]=rlse_online(aT_k1,b_k1,x,P)
-% fprintf('Palyginimui A\\b = %f\n\t\t  %f\n',aT_k1);
-% fprintf('Palyginimui A\\b = %f\n\t\t  %f\n',b_k1);
-% fprintf('Palyginimui A\\b = %f\n\t\t  %f\n',x);
 K=P*aT_k1'/(aT_k1*P*aT_k1'+1);%Eq.(18) %nuimti ; pavaizduoti K matricos verte, kuri mazejai, kai iteraciju daugeja
 x=x+K*(b_k1-aT_k1*x);%Eq.(17)
 P=P-K*aT_k1*P;%Eq.(19)
